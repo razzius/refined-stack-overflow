@@ -1,54 +1,76 @@
-function main() {
-	// highlightMyAnswers();
-	sortMyAnswersAndUpvotesToTop();
+const $myProfile = document.querySelector('.my-profile');
+const {href: myHref} = $myProfile;
+
+function isOwnAnswer($answerNode) {
+	const $answerUserLink = $answerNode.querySelector('.user-details a');
+	return $answerUserLink?.href === myHref;
 }
 
-// function highlightMyAnswers() {
-// 	document.querySelectorAll('.user-details a[href="https://stackoverflow.com/users/1636613/razzi-abuissa"]')[0].style.border = '2px solid green';
-// }
+function isNodeUpvoted($answerNode) {
+	return Boolean($answerNode.querySelector('.fc-theme-primary'));
+}
+
+function sortAnswerNodes(nodes) {
+	return [...nodes].sort((a, b) => {
+		if (isOwnAnswer(a)) {
+			return -1;
+		}
+
+		if (isOwnAnswer(b)) {
+			return 1;
+		}
+
+		if (isNodeUpvoted(a)) {
+			return -1;
+		}
+
+		if (isNodeUpvoted(b)) {
+			return 1;
+		}
+
+		return 0;
+	});
+}
+
+function main() {
+	sortMyAnswersAndUpvotesToTop();
+	highlightMyAnswers();
+	highlightMyUpvotes();
+}
+
+function highlightMyAnswers() {
+	const $answersContainer = document.querySelector('#answers');
+	const $answerNodes = $answersContainer.querySelectorAll('.answer');
+	for (const $answer of $answerNodes) {
+		if (isOwnAnswer($answer)) {
+			$answer.style.border = '2px solid #44d';
+			document.body.classList.add('my-answer');
+                  $answer.scrollIntoView(false)
+		}
+	}
+}
+function highlightMyUpvotes() {
+	const $answersContainer = document.querySelector('#answers');
+	const $answerNodes = $answersContainer.querySelectorAll('.answer');
+	for (const $answer of $answerNodes) {
+		if (isNodeUpvoted($answer)) {
+			$answer.style.border = '2px solid #44d';
+			document.body.classList.add('my-answer');
+                  $answer.scrollIntoView(false)
+		}
+	}
+}
+
 
 function sortMyAnswersAndUpvotesToTop() {
-  debugger
-
-	const $myProfile = document.querySelector('.my-profile');
-	const {href: myHref} = $myProfile;
-
-	function isOwnAnswer($answerNode) {
-		const $answerUserLink = $answerNode.querySelector('.user-details a');
-		return $answerUserLink.href === myHref;
-	}
-
-	function isNodeUpvoted($answerNode) {
-		return Boolean($answerNode.querySelector('.fc-theme-primary'));
-	}
-
-	function sortAnswerNodes(nodes) {
-		return [...nodes].slice().sort((a, b) => {
-			const candidates = [a, b];
-			for (const node of candidates) {
-				if (isOwnAnswer(node)) {
-					return node;
-				}
-			}
-
-			for (const node of candidates) {
-				if (isNodeUpvoted(node)) {
-					return node;
-				}
-			}
-
-			return a;
-		// })
-		}).reverse();
-	}
-
 	const $answersContainer = document.querySelector('#answers');
 	const $answerNodes = $answersContainer.querySelectorAll('.answer');
 	const $elementBeforeAnswers = $answerNodes[0].previousElementSibling;
 
-	// Const chars = [...$answerNodes].map(node => ({nodeUrl: node, o: isOwnAnswer(node), u: isNodeUpvoted(node)}));
 
 	const $sortedAnswers = sortAnswerNodes($answerNodes);
+	const chars = [...$sortedAnswers].map(node => ({nodeUrl: node.querySelectorAll('.user-details a'), o: isOwnAnswer(node), u: isNodeUpvoted(node)}));
+	console.log(chars);
 	const $newAnswersFragment = document.createDocumentFragment();
 
 	for (const $answer of $answerNodes) {
@@ -56,7 +78,6 @@ function sortMyAnswersAndUpvotesToTop() {
 	}
 
 	$newAnswersFragment.append(...$sortedAnswers);
-	// $newAnswersFragment.append($sortedAnswers[0]);
 
 	$answersContainer.insertBefore($newAnswersFragment, $elementBeforeAnswers.nextSibling);
 }

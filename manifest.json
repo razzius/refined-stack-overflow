@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "refined stack overflow",
   "description": "show upvoted answers / your answers first",
-  "version": "1",
+  "version": "1.1",
   "content_scripts": [
     {
       "matches": ["*://*.stackoverflow.com/*"],

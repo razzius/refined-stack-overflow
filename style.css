@@ -1,3 +1,15 @@
-.my-answer .question .fc-theme-primary .svg-icon.iconArrowUpLg {
+.has-my-answer .question .fc-theme-primary .svg-icon.iconArrowUpLg {
     filter: drop-shadow(0px -10px 0px #44d);
+}
+
+.question-page #answers .answer.my-upvote {
+    margin-left: -18px;
+    padding-left: 16px;
+    border: 2px solid #44d;
+}
+
+.question-page #answers .answer.my-answer {
+    margin-left: -18px;
+    padding-left: 16px;
+    border: 2px double #44d;
 }

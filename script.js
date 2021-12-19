@@ -7,7 +7,8 @@ function isOwnAnswer ($answerNode) {
 }
 
 function isNodeUpvoted ($answerNode) {
-  return Boolean($answerNode.querySelector('.fc-theme-primary'))
+  const $upvoteButton = $answerNode.querySelector('.js-vote-up-btn')
+  return $upvoteButton.getAttribute('aria-pressed') === 'true'
 }
 
 function sortAnswerNodes (nodes) {
@@ -43,9 +44,9 @@ function highlightMyAnswers () {
   const $answerNodes = $answersContainer.querySelectorAll('.answer')
   for (const $answer of $answerNodes) {
     if (isOwnAnswer($answer)) {
-      $answer.style.border = '2px solid #44d'
-      document.body.classList.add('my-answer')
-      $answer.scrollIntoView(false)
+      $answer.classList.add('my-answer')
+      document.body.classList.add('question-has-my-answer')
+      $answer.scrollIntoView({block: "end"})
     }
   }
 }
@@ -55,28 +56,43 @@ function highlightMyUpvotes () {
   const $answerNodes = $answersContainer.querySelectorAll('.answer')
   for (const $answer of $answerNodes) {
     if (isNodeUpvoted($answer)) {
-      $answer.style.border = '2px solid #44d'
-      document.body.classList.add('my-answer')
-      $answer.scrollIntoView(false)
+      $answer.classList.add('my-upvote')
+      document.body.classList.add('question-has-my-answer')
+      $answer.scrollIntoView({block: "end"})
     }
   }
+}
+
+function removeNodeList($nodes) {
+  $nodes.forEach($e => $e.remove())
+}
+
+function insertElementsAfter($referenceNode, $elements) {
+  const $fragment = document.createDocumentFragment()
+  $fragment.append(...$elements)
+  const $parent = $referenceNode.parentElement
+  $parent.insertBefore($fragment, $referenceNode.nextSibling)
+}
+
+function lastNode($nodes) {
+  return $nodes[$nodes.length - 1]
 }
 
 function sortMyAnswersAndUpvotesToTop () {
   const $answersContainer = document.querySelector('#answers')
   const $answerNodes = $answersContainer.querySelectorAll('.answer')
-  const $elementBeforeAnswers = $answerNodes[0].previousElementSibling
-
-  const $sortedAnswers = sortAnswerNodes($answerNodes)
-  const $newAnswersFragment = document.createDocumentFragment()
-
-  for (const $answer of $answerNodes) {
-    $answer.remove()
+  if ($answerNodes.length === 0) {
+    return
   }
 
-  $newAnswersFragment.append(...$sortedAnswers)
+  // const $elementBeforeAnswers = $answerNodes[0].previousElementSibling
 
-  $answersContainer.insertBefore($newAnswersFragment, $elementBeforeAnswers.nextSibling)
+  const $sortedAnswers = sortAnswerNodes($answerNodes)
+  const $elementAfterAnswers = lastNode($sortedAnswers).nextElementSibling
+  $sortedAnswers.forEach($e => $answersContainer.insertBefore($e, $elementAfterAnswers))
+  
+  // removeNodeList($answerNodes)
+  // insertElementsAfter($elementBeforeAnswers, $sortedAnswers)
 }
 
 main()

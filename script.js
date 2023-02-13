@@ -1,9 +1,8 @@
-const $myProfile = document.querySelector('.my-profile')
-const { href: myHref } = $myProfile
+const profileLink = document.querySelector('nav .s-user-card').href
 
 function isOwnAnswer ($answerNode) {
   const $answerUserLink = $answerNode.querySelector('.user-details a')
-  return $answerUserLink?.href === myHref
+  return $answerUserLink?.href === profileLink
 }
 
 function isNodeUpvoted ($answerNode) {
@@ -90,7 +89,7 @@ function sortMyAnswersAndUpvotesToTop () {
   const $sortedAnswers = sortAnswerNodes($answerNodes)
   const $elementAfterAnswers = lastNode($sortedAnswers).nextElementSibling
   $sortedAnswers.forEach($e => $answersContainer.insertBefore($e, $elementAfterAnswers))
-  
+
   // removeNodeList($answerNodes)
   // insertElementsAfter($elementBeforeAnswers, $sortedAnswers)
 }

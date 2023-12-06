@@ -2,10 +2,13 @@
   "manifest_version": 2,
   "name": "refined stack overflow",
   "description": "show upvoted answers / your answers first",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "content_scripts": [
     {
-      "matches": ["*://*.stackoverflow.com/*"],
+      "matches": [
+        "*://*.stackoverflow.com/*",
+        "*://askubuntu.com/*"
+      ],
       "js": ["script.js"],
       "css": ["style.css"]
     }

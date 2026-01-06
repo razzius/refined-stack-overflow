@@ -1,17 +1,17 @@
 const profileLink = document.querySelector('nav .s-user-card').href
 
-function isOwnAnswer ($answerNode) {
-  const $answerUserLink = $answerNode.querySelector('.user-details a')
+function isOwnAnswer ($answer) {
+  const $answerUserLink = $answer.querySelector('.user-details a')
   return $answerUserLink?.href === profileLink
 }
 
-function isNodeUpvoted ($answerNode) {
-  const $upvoteButton = $answerNode.querySelector('.js-vote-up-btn')
+function isNodeUpvoted ($answer) {
+  const $upvoteButton = $answer.querySelector('.js-vote-up-btn')
   return $upvoteButton.getAttribute('aria-pressed') === 'true'
 }
 
-function sortAnswerNodes (nodes) {
-  return [...nodes].sort((a, b) => {
+function sortAnswerNodes ($nodes) {
+  return [...$nodes].sort((a, b) => {
     if (isOwnAnswer(a)) {
       return -1
     }
@@ -33,65 +33,50 @@ function sortAnswerNodes (nodes) {
 }
 
 function main () {
-  sortMyAnswersAndUpvotesToTop()
-  highlightMyAnswers()
-  highlightMyUpvotes()
+  const $answersContainer = document.querySelector('#answers')
+  const $answers = $answersContainer.querySelectorAll('.answer')
+  sortMyAnswersAndUpvotesToTop($answersContainer, $answers)
+  highlightMyAnswers($answers)
+  highlightMyUpvotes($answersContainer, $answers)
+  scrollToMyAnswersAndUpvotes($answers)
 }
 
-function highlightMyAnswers () {
-  const $answersContainer = document.querySelector('#answers')
-  const $answerNodes = $answersContainer.querySelectorAll('.answer')
-  for (const $answer of $answerNodes) {
+function scrollToMyAnswersAndUpvotes ($answers) {
+  sortAnswerNodes($answers).filter(
+    $answer => isOwnAnswer($answer) || isNodeUpvoted($answer)).slice(0, 1)
+    .forEach(
+      $answer => $answer.scrollIntoView()
+    )
+}
+
+function highlightMyAnswers ($answers) {
+  for (const $answer of $answers) {
     if (isOwnAnswer($answer)) {
       $answer.classList.add('my-answer')
-      document.body.classList.add('question-has-my-answer')
-      $answer.scrollIntoView({block: "end"})
     }
   }
 }
 
-function highlightMyUpvotes () {
-  const $answersContainer = document.querySelector('#answers')
-  const $answerNodes = $answersContainer.querySelectorAll('.answer')
-  for (const $answer of $answerNodes) {
+function highlightMyUpvotes ($answersContainer, $answers) {
+  for (const $answer of $answers) {
     if (isNodeUpvoted($answer)) {
       $answer.classList.add('my-upvote')
-      document.body.classList.add('question-has-my-answer')
-      $answer.scrollIntoView({block: "end"})
     }
   }
 }
 
-function removeNodeList($nodes) {
-  $nodes.forEach($e => $e.remove())
-}
-
-function insertElementsAfter($referenceNode, $elements) {
-  const $fragment = document.createDocumentFragment()
-  $fragment.append(...$elements)
-  const $parent = $referenceNode.parentElement
-  $parent.insertBefore($fragment, $referenceNode.nextSibling)
-}
-
-function lastNode($nodes) {
+function lastNode ($nodes) {
   return $nodes[$nodes.length - 1]
 }
 
-function sortMyAnswersAndUpvotesToTop () {
-  const $answersContainer = document.querySelector('#answers')
-  const $answerNodes = $answersContainer.querySelectorAll('.answer')
-  if ($answerNodes.length === 0) {
+function sortMyAnswersAndUpvotesToTop ($answersContainer, $answers) {
+  if ($answers.length === 0) {
     return
   }
 
-  // const $elementBeforeAnswers = $answerNodes[0].previousElementSibling
-
-  const $sortedAnswers = sortAnswerNodes($answerNodes)
+  const $sortedAnswers = sortAnswerNodes($answers)
   const $elementAfterAnswers = lastNode($sortedAnswers).nextElementSibling
   $sortedAnswers.forEach($e => $answersContainer.insertBefore($e, $elementAfterAnswers))
-
-  // removeNodeList($answerNodes)
-  // insertElementsAfter($elementBeforeAnswers, $sortedAnswers)
 }
 
 main()
